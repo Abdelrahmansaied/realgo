@@ -23,8 +23,6 @@ chrome_options.add_argument("--headless")
 chrome_options.add_argument("--disable-dev-shm-usage")
 chrome_options.add_argument("--disable-gpu")
 chrome_options.add_argument("--window-size=1920x1080")
-user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-chrome_options.add_argument(f"user-agent={user_agent}")
 
 results_lock = threading.Lock()
 
@@ -34,11 +32,8 @@ def ex_dif_match(part, values):
     match = re.search(pattern, values, flags=re.IGNORECASE)
     return match
 
-def duckduckgo_search(query, result_dict, index, domain, progress_callback):
-    chrome_version = "120.0.6099.224"  # Replace with your actual Chrome version
-
-# Initialize the driver
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager(chrome_version).install()), options=chrome_options)
+def duckduckgo_search(query, result_dict, index, domain):
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
     url = f'https://www.google.com/search?q={query}+PDF'
     driver.get(url)
     time.sleep(random.uniform(2, 4))
@@ -58,7 +53,6 @@ def duckduckgo_search(query, result_dict, index, domain, progress_callback):
 
     with results_lock:
         result_dict[index] = filter_and_search_content(links, query, domain)
-        progress_callback(index)
 
 def filter_and_search_content(links, mpn, domain):
     mpn_pattern = re.compile(re.escape(mpn), re.IGNORECASE)
@@ -138,13 +132,17 @@ if uploaded_file:
                 result_dict = {}
                 threads = []
                 
-                
                 for index, row in inner_join.iterrows():
                     mpn = row['MPN']
                     se_man_name = row['Website']
                     search_domain = clean_url(se_man_name)
                     search_query = f"{mpn}"
-                    thread = threading.Thread(target=duckduckgo_search, args=(search_query, result_dict, index, search_domain))
+
+                    # Start the thread without progress bar
+                    thread = threading.Thread(
+                        target=duckduckgo_search,
+                        args=(search_query, result_dict, index, search_domain)
+                    )
                     threads.append(thread)
                     thread.start()
                     time.sleep(random.uniform(3, 10))
