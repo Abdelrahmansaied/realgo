@@ -35,7 +35,10 @@ def ex_dif_match(part, values):
     return match
 
 def duckduckgo_search(query, result_dict, index, domain, progress_callback):
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+    chrome_version = "120.0.6099.224"  # Replace with your actual Chrome version
+
+# Initialize the driver
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager(chrome_version).install()), options=chrome_options)
     url = f'https://www.google.com/search?q={query}+PDF'
     driver.get(url)
     time.sleep(random.uniform(2, 4))
