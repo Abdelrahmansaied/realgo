@@ -127,12 +127,8 @@ if uploaded_file:
     if 'MPN' not in df.columns or 'SE_MAN_NAME' not in df.columns:
         st.error("Input file must contain 'MPN' and 'SE_MAN_NAME' columns.")
     else:
-        mfr_table_path = r'\\10.199.104.106\mfr_files\Vendor_Profile'
-        zz = os.listdir(mfr_table_path)
-        for i in zz:
-            if i.startswith("MFR_Table"):
-                pd3 = pd.read_excel(os.path.join(mfr_table_path, i))
-
+            uploaded_filee = st.file_uploader("Upload MFR file", type=["xlsx"])
+            pd3=pd.read_excel(uploaded_filee)
             pd3.rename(columns={'SE Name': 'SE_MAN_NAME'}, inplace=True)
             inner_join = pd.merge(df, pd3[['SE_MAN_NAME', 'Website']], on='SE_MAN_NAME', how='left')
             inner_join['Online Link'] = ''
