@@ -138,14 +138,13 @@ if uploaded_file:
                 result_dict = {}
                 threads = []
                 
-                progress_bar = st.progress(0)
                 
                 for index, row in inner_join.iterrows():
                     mpn = row['MPN']
                     se_man_name = row['Website']
                     search_domain = clean_url(se_man_name)
                     search_query = f"{mpn}"
-                    thread = threading.Thread(target=duckduckgo_search, args=(search_query, result_dict, index, search_domain, lambda idx: progress_bar.progress((idx + 1) / len(inner_join))))
+                    thread = threading.Thread(target=duckduckgo_search, args=(search_query, result_dict, index, search_domain))
                     threads.append(thread)
                     thread.start()
                     time.sleep(random.uniform(3, 10))
