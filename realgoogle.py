@@ -127,39 +127,39 @@ if uploaded_file:
     if 'MPN' not in df.columns or 'SE_MAN_NAME' not in df.columns:
         st.error("Input file must contain 'MPN' and 'SE_MAN_NAME' columns.")
     else:
-            uploaded_filee = st.file_uploader("Upload MFR file", type=["xlsx"])
-            pd3=pd.read_excel(uploaded_filee)
-            pd3.rename(columns={'SE Name': 'SE_MAN_NAME'}, inplace=True)
-            inner_join = pd.merge(df, pd3[['SE_MAN_NAME', 'Website']], on='SE_MAN_NAME', how='left')
-            inner_join['Online Link'] = ''
-            result_dict = {}
-            threads = []
-
-            progress_bar = st.progress(0)
-
-            for index, row in inner_join.iterrows():
-                mpn = row['MPN']
-                se_man_name = row['Website']
-                search_domain = clean_url(se_man_name)
-                search_query = f"{mpn}"
-                thread = threading.Thread(target=duckduckgo_search, args=(search_query, result_dict, index, search_domain, lambda idx: progress_bar.progress((idx + 1) / len(inner_join))))
-                threads.append(thread)
-                thread.start()
-                time.sleep(random.uniform(3, 10))
-
-            for thread in threads:
-                thread.join()
-
-            for index, row in inner_join.iterrows():
-                results = result_dict.get(index, [])
-                found_link = results[0] if results else None
-                inner_join.at[index, 'Online Link'] = found_link if found_link else "No link found"
-
-            st.success("Process completed!")
-            st.write(inner_join)
-
-            output_file = f"results_{datetime.now().strftime('%Y%m%d')}.xlsx"
-            inner_join.to_excel(output_file, index=False)
-
-            with open(output_file, 'rb') as f:
-                st.download_button("Download Results", f, file_name=output_file)
+        uploaded_filee = st.file_uploader("Upload MFR file", type=["xlsx"])
+        pd3=pd.read_excel(uploaded_filee)
+        pd3.rename(columns={'SE Name': 'SE_MAN_NAME'}, inplace=True)
+        inner_join = pd.merge(df, pd3[['SE_MAN_NAME', 'Website']], on='SE_MAN_NAME', how='left')
+        inner_join['Online Link'] = ''
+        result_dict = {}
+        threads = []
+        
+        progress_bar = st.progress(0)
+        
+        for index, row in inner_join.iterrows():
+            mpn = row['MPN']
+            se_man_name = row['Website']
+            search_domain = clean_url(se_man_name)
+            search_query = f"{mpn}"
+            thread = threading.Thread(target=duckduckgo_search, args=(search_query, result_dict, index, search_domain, lambda idx: progress_bar.progress((idx + 1) / len(inner_join))))
+            threads.append(thread)
+            thread.start()
+            time.sleep(random.uniform(3, 10))
+        
+        for thread in threads:
+            thread.join()
+        
+        for index, row in inner_join.iterrows():
+            results = result_dict.get(index, [])
+            found_link = results[0] if results else None
+            inner_join.at[index, 'Online Link'] = found_link if found_link else "No link found"
+        
+        st.success("Process completed!")
+        st.write(inner_join)
+        
+        output_file = f"results_{datetime.now().strftime('%Y%m%d')}.xlsx"
+        inner_join.to_excel(output_file, index=False)
+        
+        with open(output_file, 'rb') as f:
+            st.download_button("Download Results", f, file_name=output_file)
