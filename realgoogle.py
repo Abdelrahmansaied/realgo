@@ -7,6 +7,7 @@ import requests
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from difflib import get_close_matches
@@ -38,7 +39,7 @@ def ex_dif_match(part, values):
     return match
 
 def duckduckgo_search(query, result_dict, index, domain, progress_callback):
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()), options=chrome_options)
     url = f'https://www.google.com/search?q={query}+PDF'
     driver.get(url)
     time.sleep(random.uniform(2, 4))
@@ -116,7 +117,7 @@ def clean_url(url):
     return re.sub(r'.+//|www\.|(\..+)', '', url)
 
 # Streamlit UI
-st.title("PDF Search Tool")
+st.title("Real Go Search Tool")
 uploaded_file = st.file_uploader("Upload your Excel file", type=["xlsx"])
 
 if uploaded_file:
