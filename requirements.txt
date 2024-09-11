@@ -3,5 +3,6 @@ pandas
 selenium
 beautifulsoup4
 requests
+openpyxl
 PyPDF2
 webdriver-manager
